@@ -8,6 +8,9 @@ import {
   Field,
   Form,
 } from './ContactForm.styled';
+import { useDispatch, useSelector } from 'react-redux';
+import { addContact } from '../../redux/contactsSlice';
+import { getContacts } from '../../redux/selectors';
 
 const contactSchema = Yup.object().shape({
   name: Yup.string().min(2, 'Too Short!').required('Required'),
@@ -17,7 +20,19 @@ const contactSchema = Yup.object().shape({
     .required('Required'),
 });
 
-export const ContactForm = ({ onAdd }) => {
+export const ContactForm = () => {
+  const contacts = useSelector(getContacts);
+  const dispatch = useDispatch();
+
+  const onAdd = newContact => {
+    if (contacts.some(contact => contact.name === newContact.name)) {
+      alert(`${newContact.name} is already in contacts.`);
+    } else {
+      dispatch(addContact(newContact));
+      // dispatch(addContact({ ...newContact, id: nanoid() }));
+    }
+  };
+
   return (
     <Formik
       initialValues={{
